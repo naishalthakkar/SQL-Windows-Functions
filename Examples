@@ -1,0 +1,242 @@
+RUNNING TOTALS
+
+Question:
+The cats must be ordered by name and will enter an elevator one by one. We would like to know what the running total weight is.
+
+Return: name, running total weight
+Order by: name
+
+name	  breed	            weight	  color	  age
+Ashes	  Persian	          4.5	      Black	   5
+Molly	  Persian	          4.2	      Black	    1
+Felix	  Persian	          5.0	  Tortoiseshell	2
+Smudge	British Shorthair	4.9	      Black	    4
+Tigger	British Shorthair	3.8	  Tortoiseshell	2
+Alfie	  Siamese	          5.5	      Brown	    5
+Oscar	  Siamese	          6.1	      Black	    1
+Millie	 Maine Coon	      5.4	Tortoiseshell	  5
+Misty	   Maine Coon	      5.7	      Brown	    2
+Puss	   Maine Coon	      5.1	Tortoiseshell	  2
+Smokey	Maine Coon	      6.1	      Brown	    4
+Charlie	British Shorthair	4.8	      Black	    4
+
+Desired output:
+name	  running_total_weight
+Alfie	    5.5
+Ashes	    10.0
+Charlie	  14.8
+Felix	    19.8
+Millie	  25.2
+Misty	    30.9
+Molly	    35.1
+Oscar	    41.2
+Puss	    46.3
+Smokey	  52.4
+Smudge	  57.3
+Tigger	  61.1
+
+
+select  name, SUM(weight) OVER (ORDER BY name)
+from cats 
+
+
+
+
+
+
+
+
+PARTITIONED RUNNING TOTALS
+
+Question:
+The cats must be ordered first by breed and second by name. They are about to enter an elevator one by one. When all the cats of the same breed have entered they leave.
+
+We would like to know what the running total weight of the cats is.
+
+Return: name, breed, running total weight
+Order by: breed, name
+
+name	  breed	            weight	  color	   age
+Ashes	  Persian	          4.5	      Black	    5
+Molly	  Persian	          4.2	      Black	    1
+Felix	  Persian	          5.0	  Tortoiseshell	2
+Smudge	British Shorthair	4.9	      Black	    4
+Tigger	British Shorthair	3.8	  Tortoiseshell	2
+Alfie	  Siamese	          5.5	      Brown	    5
+Oscar	  Siamese	          6.1	      Black	    1
+Millie	 Maine Coon	      5.4	Tortoiseshell	  5
+Misty	   Maine Coon	      5.7	      Brown	    2
+Puss	   Maine Coon	      5.1	Tortoiseshell	  2
+Smokey	Maine Coon	      6.1	      Brown	    4
+Charlie	British Shorthair	4.8	      Black	    4
+
+
+
+select name, breed, SUM(weight) OVER (PARTITION BY breed ORDER BY name)
+FROM cats
+
+Result
+name	  breed	        running_total_weight
+Charlie	  British Shorthair	  4.8
+Smudge	  British Shorthair	  9.7
+Tigger	  British Shorthair	  13.5
+Millie	  Maine Coon	        5.4
+Misty	    Maine Coon	        11.1
+Puss	    Maine Coon	        16.2
+Smokey	  Maine Coon	        22.3
+Ashes	    Persian	            4.5
+Felix	    Persian	            9.5
+Molly	    Persian	            13.7
+Alfie	    Siamese	            5.5
+Oscar	    Siamese	            11.6
+
+
+
+
+
+EXAMINING NEARBY ROWS
+
+
+Question:
+The cats would like to see the average of the weight of them, the cat just after them and the cat just before them.
+
+The first and last cats are content to have an average weight of consisting of 2 cats not 3.
+
+
+
+name	  breed	            weight	  color	   age
+Ashes	  Persian	          4.5	      Black	    5
+Molly	  Persian	          4.2	      Black	    1
+Felix	  Persian	          5.0	  Tortoiseshell	2
+Smudge	British Shorthair	4.9	      Black	    4
+Tigger	British Shorthair	3.8	  Tortoiseshell	2
+Alfie	  Siamese	          5.5	      Brown	    5
+Oscar	  Siamese	          6.1	      Black	    1
+Millie	 Maine Coon	      5.4	Tortoiseshell	  5
+Misty	   Maine Coon	      5.7	      Brown	    2
+Puss	   Maine Coon	      5.1	Tortoiseshell	  2
+Smokey	Maine Coon	      6.1	      Brown	    4
+Charlie	British Shorthair	4.8	      Black	    4
+
+
+name	    weight	    average_weight
+Tigger	  3.8	          4.0
+Molly	    4.2	          4.2
+Ashes	    4.5	          4.5
+Charlie	  4.8	          4.7
+Smudge	  4.9	          4.9
+Felix	    5.0	          5.0
+Puss	    5.1	          5.2
+Millie	  5.4	          5.3
+Alfie	    5.5	          5.5
+Misty	    5.7	          5.8
+Oscar	    6.1	          6.0
+Smokey	  6.1	          6.1
+
+
+select name, weight, AVG(weight) OVER (ORDER BY weight ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS average_weight
+from cats 
+
+
+
+
+UNIQUE NUMBERS
+
+
+Question:
+The cats form a line grouped by color. Inside each color group the cats order themselves by name. Every cat must have a unique number for its place in the line.
+
+We must assign each cat a unique number while maintaining their color & name ordering.
+
+
+Table
+name	  breed	            weight	  color	   age
+Ashes	  Persian	          4.5	      Black	    5
+Molly	  Persian	          4.2	      Black	    1
+Felix	  Persian	          5.0	  Tortoiseshell	2
+Smudge	British Shorthair	4.9	      Black	    4
+Tigger	British Shorthair	3.8	  Tortoiseshell	2
+Alfie	  Siamese	          5.5	      Brown	    5
+Oscar	  Siamese	          6.1	      Black	    1
+Millie	 Maine Coon	      5.4	Tortoiseshell	  5
+Misty	   Maine Coon	      5.7	      Brown	    2
+Puss	   Maine Coon	      5.1	Tortoiseshell	  2
+Smokey	Maine Coon	      6.1	      Brown	    4
+Charlie	British Shorthair	4.8	      Black	    4
+
+
+Desired output:
+unique_number	  name	  color
+1	              Ashes	  Black
+2	              Charlie	Black
+3	              Molly	  Black
+4	              Oscar	  Black
+5	              Smudge	Black
+6	              Alfie	  Brown
+7	              Misty	  Brown
+8	              Smokey	Brown
+9	              Felix	  Tortoiseshell
+10	            Millie	Tortoiseshell
+11	            Puss	  Tortoiseshell
+12	            Tigger	Tortoiseshell
+
+
+select row_number() over (order by color,name) as unique_number, name, color from cats
+
+
+
+
+ORDERRING
+
+
+Question:
+We would like to find the fattest cat. Order all our cats by weight.
+
+The two heaviest cats should both be 1st. The next heaviest should be 3rd.
+
+
+Table
+name	  breed	            weight	  color	   age
+Ashes	  Persian	          4.5	      Black	    5
+Molly	  Persian	          4.2	      Black	    1
+Felix	  Persian	          5.0	  Tortoiseshell	2
+Smudge	British Shorthair	4.9	      Black	    4
+Tigger	British Shorthair	3.8	  Tortoiseshell	2
+Alfie	  Siamese	          5.5	      Brown	    5
+Oscar	  Siamese	          6.1	      Black	    1
+Millie	 Maine Coon	      5.4	Tortoiseshell	  5
+Misty	   Maine Coon	      5.7	      Brown	    2
+Puss	   Maine Coon	      5.1	Tortoiseshell	  2
+Smokey	Maine Coon	      6.1	      Brown	    4
+Charlie	British Shorthair	4.8	      Black	    4
+
+
+Desired output:
+ranking	    weight	    name
+1	          6.1	        Oscar
+1	          6.1	        Smokey
+3	          5.7	        Misty
+4	          5.5	        Alfie
+5	          5.4	        Millie
+6	          5.1	        Puss
+7	          5.0	        Felix
+8	          4.9	        Smudge
+9	          4.8	        Charlie
+10	        4.5	        Ashes
+11	        4.2	        Molly
+12	        3.8	        Tigger
+
+
+select rank() over (order by weight desc) as ranking, weight, name from cats
+order by ranking, name ASC
+
+
+
+
+
+
+
+
+
+
+
